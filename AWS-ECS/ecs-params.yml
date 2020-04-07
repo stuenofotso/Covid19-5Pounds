@@ -1,0 +1,23 @@
+version: 1
+task_definition:
+  services:
+    web:
+      cpu_shares: 128
+      mem_limit: 1.0GB
+    elasticsearch:
+      cpu_shares: 128
+      mem_limit: 1.0GB
+  task_execution_role: ecsTaskExecutionRole
+  ecs_network_mode: awsvpc
+  task_size:
+    mem_limit: 2.0GB
+    cpu_limit: 256
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - subnet-01960df622a6da7e3
+        - subnet-0ed3f7937ba9b59bc
+      security_groups:
+        - sg-0d28a1fd4c7db5558
+      assign_public_ip: ENABLED

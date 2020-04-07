@@ -1,0 +1,23 @@
+version: '2.4'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-covid19-cluster
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - /data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    mem_limit: 512m
+    mem_reservation: 256m
+  

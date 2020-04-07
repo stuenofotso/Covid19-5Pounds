@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:TalendJSON="http://www.talend.org/json" xmlns:TalendMetadata="http://www.talend.org/metadata/connection/2010" xmlns:orgomg.cwm.resource.record="http:///orgomg/cwm/resource/record.ecore">
+  <TalendJSON:JSONFileConnection xmi:id="__tjpAHOOEeqABovdVAAd1g" name="covid_api_returned_json" dataPackage="__tjpCXOOEeqABovdVAAd1g" JSONFilePath="/Users/steve/Documents/DOCU_JEFF/Heroku_Projects/Covid19/2020-03-19.json" Encoding="UTF-8" readbyMode="JSONPATH">
+    <schema xmi:id="__tjpAXOOEeqABovdVAAd1g" LimitBoucle="50" AbsoluteXPathQuery="$[*]" flag="ROOT_OBJECT">
+      <schemaTargets xmi:id="__tjpAnOOEeqABovdVAAd1g" RelativeXPathQuery="Country" TagName="Country"/>
+      <schemaTargets xmi:id="__tjpA3OOEeqABovdVAAd1g" RelativeXPathQuery="Province" TagName="Province"/>
+      <schemaTargets xmi:id="__tjpBHOOEeqABovdVAAd1g" RelativeXPathQuery="Lat" TagName="Lat"/>
+      <schemaTargets xmi:id="__tjpBXOOEeqABovdVAAd1g" RelativeXPathQuery="Lon" TagName="Lon"/>
+      <schemaTargets xmi:id="__tjpBnOOEeqABovdVAAd1g" RelativeXPathQuery="Date" TagName="Date"/>
+      <schemaTargets xmi:id="__tjpB3OOEeqABovdVAAd1g" RelativeXPathQuery="Cases" TagName="Cases"/>
+      <schemaTargets xmi:id="__tjpCHOOEeqABovdVAAd1g" RelativeXPathQuery="Status" TagName="Status"/>
+    </schema>
+  </TalendJSON:JSONFileConnection>
+  <orgomg.cwm.resource.record:RecordFile xmi:id="__tjpCXOOEeqABovdVAAd1g" name="default" dataManager="__tjpAHOOEeqABovdVAAd1g">
+    <ownedElement xsi:type="TalendMetadata:MetadataTable" xmi:id="__tjpCnOOEeqABovdVAAd1g" id="_4CglsHOKEeqABovdVAAd1g" label="metadata">
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpC3OOEeqABovdVAAd1g" label="Country" length="11" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpDHOOEeqABovdVAAd1g" label="Province" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpDXOOEeqABovdVAAd1g" label="Lat" length="-1" talendType="id_Double" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpDnOOEeqABovdVAAd1g" label="Lon" length="-1" talendType="id_Double" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpD3OOEeqABovdVAAd1g" label="Date" length="-1" talendType="id_String" pattern="&quot;dd-MM-yyyy HH:mm:ss&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpEHOOEeqABovdVAAd1g" label="Cases" length="-1" talendType="id_Double" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="__tjpEXOOEeqABovdVAAd1g" label="Status" length="9" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+    </ownedElement>
+  </orgomg.cwm.resource.record:RecordFile>
+</xmi:XMI>

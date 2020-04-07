@@ -1,0 +1,48 @@
+PUT _transform/real_confirmed_cases_generator_per_country
+{
+  "source": {
+    "index": [
+      "covid19_raw_data"
+    ]
+  },
+  "pivot": {
+    "group_by": {
+      "Date": {
+        "date_histogram": {
+          "field": "Date",
+          "calendar_interval": "1d"
+        }
+      },
+      "Country": {
+        "terms": {
+          "field": "Country"
+        }
+      },
+      "CountryCode": {
+        "terms": {
+          "field": "CountryCode"
+        }
+      }
+    },
+    "aggregations": {
+      "RealConfirmedCases": {
+        "scripted_metric": {
+          "init_script": "state.transactions = []",
+          "map_script": "state.transactions.add(doc.Confirmed.value-doc.Deaths.value-doc.Recovered.value-doc.Active.value)",
+          "combine_script": "double res = 0; for (t in state.transactions) { res += t } return res",
+          "reduce_script": "double res = 0; for (a in states) { res += a } return res"
+        }
+      }
+    }
+  },
+  "description": "generate real confirmed cases per country from raw cases",
+  "dest": {
+    "index": "covid19_real_confirmed_cases_data"
+  },
+  "sync": {
+    "time": {
+      "field": "Date",
+      "delay": "1d"
+    }
+  }
+}

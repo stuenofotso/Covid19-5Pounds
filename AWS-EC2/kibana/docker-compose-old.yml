@@ -1,0 +1,16 @@
+version: '2.2'
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    environment:
+      - SERVER_PORT=5601
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=["http://ec2-3-135-203-125.us-east-2.compute.amazonaws.com:9200","http://ec2-13-58-53-1.us-east-2.compute.amazonaws.com:9200","http://ec2-18-220-232-235.us-east-2.compute.amazonaws.com:9200","http://ec2-18-224-63-68.us-east-2.compute.amazonaws.com:9200"]
+      - ELASTICSEARCH_USERNAME=kibana
+      - ELASTICSEARCH_PASSWORD=\730*1:%V%Hr
+      - XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=false
+      
+    ports:
+      - 80:5601
+  
+  

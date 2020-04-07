@@ -1,0 +1,68 @@
+[
+ {
+  "Country": "Afghanistan",
+  "CountryCode": "AF",
+  "Lat": "33.94",
+  "Lon": "67.71",
+  "Confirmed": 0,
+  "Deaths": 0,
+  "Recovered": 0,
+  "Active": 0,
+  "Date": "2020-01-22T00:00:00Z",
+  "LocationID": "828ca7f3-144f-4732-b659-a60f97755626"
+ },
+ {
+  "Country": "Afghanistan",
+  "CountryCode": "AF",
+  "Lat": "33.94",
+  "Lon": "67.71",
+  "Confirmed": 0,
+  "Deaths": 0,
+  "Recovered": 0,
+  "Active": 0,
+  "Date": "2020-01-23T00:00:00Z",
+  "LocationID": "828ca7f3-144f-4732-b659-a60f97755626"
+ },
+ {
+  "Country": "Afghanistan",
+  "CountryCode": "AF",
+  "Lat": "33.94",
+  "Lon": "67.71",
+  "Confirmed": 0,
+  "Deaths": 0,
+  "Recovered": 0,
+  "Active": 0,
+  "Date": "2020-01-24T00:00:00Z",
+  "LocationID": "828ca7f3-144f-4732-b659-a60f97755626"
+ },
+ {
+  "Country": "Australia",
+  "CountryCode": "AU",
+  "Province": "South Australia",
+  "City": "South Australia",
+  "CityCode": "South Australia",
+  "Lat": "-34.93",
+  "Lon": "138.6",
+  "Confirmed": 0,
+  "Deaths": 0,
+  "Recovered": 0,
+  "Active": 0,
+  "Date": "2020-01-22T00:00:00Z",
+  "LocationID": "6ea13e74-4201-4397-9fad-bab8edc8062b"
+ },
+ {
+  "Country": "Australia",
+  "CountryCode": "AU",
+  "Province": "Australian Capital Territory",
+  "City": "Australian Capital Territory",
+  "CityCode": "Australian Capital Territory",
+  "Lat": "-35.47",
+  "Lon": "149.01",
+  "Confirmed": 0,
+  "Deaths": 0,
+  "Recovered": 0,
+  "Active": 0,
+  "Date": "2020-01-22T00:00:00Z",
+  "LocationID": "3886a394-c300-419e-96ea-5a8d35b9947f"
+ }
+ ]

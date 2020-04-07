@@ -1,0 +1,551 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "KeyName": {
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the ECS instances"
+        },
+        "DesiredCapacity": {
+            "Type": "Number",
+            "Default": "2",
+            "Description": "Number of instances to launch in your ECS cluster"
+        },
+        "InstanceType": {
+            "Description": "The EC2 instance type",
+            "Type": "String",
+            "Default": "t2.medium",
+            "AllowedValues": [
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "r3.large",
+                "r3.xlarge",
+                "r3.2xlarge",
+                "r3.4xlarge",
+                "r3.8xlarge",
+                "i2.xlarge",
+                "i2.2xlarge",
+                "i2.4xlarge",
+                "i2.8xlarge",
+                "d2.xlarge",
+                "d2.2xlarge",
+                "d2.4xlarge",
+                "d2.8xlarge",
+                "hi1.4xlarge",
+                "hs1.8xlarge",
+                "cr1.8xlarge",
+                "cc2.8xlarge"
+            ],
+            "ConstraintDescription": "must be a valid EC2 instance type."
+        },
+        "SSHLocation": {
+            "Description": " The IP address range that can be used to SSH to the EC2 instances",
+            "Type": "String",
+            "MinLength": "9",
+            "MaxLength": "18",
+            "Default": "0.0.0.0/0",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        },
+        "CIDRVPC": {
+            "Description": "Enter the CIDR Range for your VPC",
+            "Type": "String",
+            "MinLength": "9",
+            "MaxLength": "18",
+            "Default": "192.168.0.0/16",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        },
+        "CIDRSubnet1": {
+            "Description": "Enter the CIDR Range for your VPC",
+            "Type": "String",
+            "MinLength": "9",
+            "MaxLength": "18",
+            "Default": "192.168.1.0/24",
+            "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must be a valid IP CIDR range of the form x.x.x.x/x."
+        },
+        "ECSAMI": {
+            "Description": "AMI ID",
+            "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+            "Default": "/aws/service/ecs/optimized-ami/amazon-linux/recommended/image_id"
+        }
+    },
+    "Resources": {
+        "VPC": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {
+                    "Ref": "CIDRVPC"
+                },
+                "EnableDnsSupport": true,
+                "EnableDnsHostnames": true,
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Volume-Driver VPC"
+                    }
+                ]
+            }
+        },
+        "Subnet1": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "MapPublicIpOnLaunch": true,
+                "CidrBlock": {
+                    "Ref": "CIDRSubnet1"
+                },
+                "AvailabilityZone": {
+                    "Fn::Select": [
+                        "0",
+                        {
+                            "Fn::GetAZs": {
+                                "Ref": "AWS::Region"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "InternetGateway": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Network",
+                        "Value": "Public"
+                    }
+                ]
+            }
+        },
+        "GatewayToInternet": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "PublicRouteTable": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    },
+                    {
+                        "Key": "Network",
+                        "Value": "Public"
+                    }
+                ]
+            }
+        },
+        "PublicRoute": {
+            "DependsOn": [
+                "PublicRouteTable",
+                "InternetGateway"
+            ],
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "PublicRouteTable"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "PublicSubnetRouteTableAssociation": {
+            "DependsOn": [
+                "Subnet1",
+                "PublicRouteTable"
+            ],
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "Subnet1"
+                },
+                "RouteTableId": {
+                    "Ref": "PublicRouteTable"
+                }
+            }
+        },
+        "InstanceSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "Enable SSH access via port 22",
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "22",
+                        "ToPort": "22",
+                        "CidrIp": {
+                            "Ref": "SSHLocation"
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "3306",
+                        "ToPort": "3306",
+                        "CidrIp": {
+                            "Ref": "SSHLocation"
+                        }
+                    }
+                ]
+            }
+        },
+        "NetworkLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Scheme": "internet-facing",
+                "Subnets": [
+                    {
+                        "Ref": "Subnet1"
+                    }
+                ],
+                "Type": "network"
+            }
+        },
+        "NLBListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "MySQLTargetGroup"
+                        }
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "NetworkLoadBalancer"
+                },
+                "Port": 3306,
+                "Protocol": "TCP"
+            }
+        },
+        "MySQLTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "Port": 3306,
+                "Protocol": "TCP",
+                "TargetType": "ip",
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            }
+        },
+        "ECSCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "ClusterName": "rexray-demo"
+            }
+        },
+        "ECSAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "AvailabilityZones": [
+                    {
+                        "Fn::Select": [
+                            "0",
+                            {
+                                "Fn::GetAZs": {
+                                    "Ref": "AWS::Region"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "Subnet1"
+                    }
+                ],
+                "LaunchConfigurationName": {
+                    "Ref": "ContainerInstances"
+                },
+                "MinSize": "2",
+                "MaxSize": "2",
+                "DesiredCapacity": "2",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "ECS host",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Timeout": "PT15M"
+                }
+            },
+            "UpdatePolicy": {
+                "AutoScalingRollingUpdate": {
+                    "MinInstancesInService": "1",
+                    "MaxBatchSize": "1",
+                    "PauseTime": "PT15M",
+                    "WaitOnResourceSignals": "true",
+                    "SuspendProcesses": [
+                        "HealthCheck",
+                        "ReplaceUnhealthy",
+                        "AZRebalance",
+                        "AlarmNotification",
+                        "ScheduledActions"
+                    ]
+                }
+            }
+        },
+        "ContainerInstances": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "ImageId": {
+                    "Ref": "ECSAMI"
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "EC2InstanceProfile"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "AssociatePublicIpAddress": true,
+                "SecurityGroups": [
+                    {
+                        "Ref": "InstanceSecurityGroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Sub": "#!/bin/bash\nyum install -y aws-cfn-bootstrap\n/opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ContainerInstances\n/opt/aws/bin/cfn-signal -e $? --region ${AWS::Region} --stack ${AWS::StackName} --resource ECSAutoScalingGroup\n\nexec 2>>/var/log/ecs/ecs-agent-install.log\nset -x\nuntil curl -s http://localhost:51678/v1/metadata\ndo\n   sleep 1\ndone\ndocker plugin install rexray/ebs REXRAY_PREEMPT=true EBS_REGION=us-west-2 --grant-all-permissions\nstop ecs \nstart ecs\n"
+                    }
+                }
+            },
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "packages": {
+                            "yum": {
+                                "aws-cli": [],
+                                "jq": [],
+                                "ecs-init": []
+                            }
+                        },
+                        "commands": {
+                            "01_add_instance_to_cluster": {
+                                "command": {
+                                    "Fn::Sub": "echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config"
+                                }
+                            },
+                            "02_start_ecs_agent": {
+                                "command": "start ecs"
+                            }
+                        },
+                        "files": {
+                            "/etc/cfn/cfn-hup.conf": {
+                                "mode": 256,
+                                "owner": "root",
+                                "group": "root",
+                                "content": {
+                                    "Fn::Sub": "[main]\nstack=${AWS::StackId}\nregion=${AWS::Region}\n"
+                                }
+                            },
+                            "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                                "content": {
+                                    "Fn::Sub": "[cfn-auto-reloader-hook]\ntriggers=post.update\npath=Resources.ContainerInstances.Metadata.AWS::CloudFormation::Init\naction=/opt/aws/bin/cfn-init -v --region ${AWS::Region} --stack ${AWS::StackName} --resource ContainerInstances\n"
+                                }
+                            }
+                        },
+                        "services": {
+                            "sysvinit": {
+                                "cfn-hup": {
+                                    "enabled": "true",
+                                    "ensureRunning": "true",
+                                    "files": [
+                                        "/etc/cfn/cfn-hup.conf",
+                                        "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "EC2Role": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/",
+                "AssumeRolePolicyDocument": "{\n  \"Statement\": [{\n      \"Action\": \"sts:AssumeRole\",\n      \"Effect\": \"Allow\",\n      \"Principal\": {\n        \"Service\": \"ec2.amazonaws.com\"\n      }\n  }]\n}\n",
+                "Policies": [
+                    {
+                        "PolicyName": "ECSforEC2InstanceRolePolicy",
+                        "PolicyDocument": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"ecs:CreateCluster\",\n        \"ecs:DeregisterContainerInstance\",\n        \"ecs:DiscoverPollEndpoint\",\n        \"ecs:Poll\",\n        \"ecs:RegisterContainerInstance\",\n        \"ecs:StartTelemetrySession\",\n        \"ecs:Submit*\",\n        \"ecr:GetAuthorizationToken\",\n        \"ecr:BatchCheckLayerAvailability\",\n        \"ecr:GetDownloadUrlForLayer\",\n        \"ecr:BatchGetImage\",\n        \"logs:CreateLogStream\",\n        \"logs:PutLogEvents\"\n      ],\n      \"Resource\": \"*\"\n    }\n  ]\n}\n"
+                    },
+                    {
+                        "PolicyName": "RexrayPolicy",
+                        "PolicyDocument": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Action\": [\n      \"ec2:AttachVolume\",\n      \"ec2:CreateVolume\",\n      \"ec2:CreateSnapshot\",\n      \"ec2:CreateTags\",\n      \"ec2:DeleteVolume\",\n      \"ec2:DeleteSnapshot\",\n      \"ec2:DescribeAvailabilityZones\",\n      \"ec2:DescribeInstances\",\n      \"ec2:DescribeVolumes\",\n      \"ec2:DescribeVolumeAttribute\",\n      \"ec2:DescribeVolumeStatus\",\n      \"ec2:DescribeSnapshots\",\n      \"ec2:CopySnapshot\",\n      \"ec2:DescribeSnapshotAttribute\",\n      \"ec2:DetachVolume\",\n      \"ec2:ModifySnapshotAttribute\",\n      \"ec2:ModifyVolumeAttribute\",\n      \"ec2:DescribeTags\"\n    ],\n    \"Resource\": \"*\"\n  }]\n}\n"
+                    }
+                ]
+            }
+        },
+        "ECSServiceAutoScalingRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": {
+                        "Action": [
+                            "sts:AssumeRole"
+                        ],
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [
+                                "application-autoscaling.amazonaws.com"
+                            ]
+                        }
+                    }
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "ecs-service-autoscaling",
+                        "PolicyDocument": {
+                            "Statement": {
+                                "Effect": "Allow",
+                                "Action": [
+                                    "application-autoscaling:*",
+                                    "cloudwatch:DescribeAlarms",
+                                    "cloudwatch:PutMetricAlarm",
+                                    "ecs:DescribeServices",
+                                    "ecs:UpdateService"
+                                ],
+                                "Resource": "*"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "EC2InstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "EC2Role"
+                    }
+                ]
+            }
+        },
+        "CWLogsGroup": {
+            "Type": "AWS::Logs::LogGroup"
+        }
+    },
+    "Outputs": {
+        "AWSRegion": {
+            "Description": "The name of the region where the stack was launched",
+            "Value": {
+                "Ref": "AWS::Region"
+            }
+        },
+        "AvailabilityZone": {
+            "Description": "The AZ where the instances are deployed",
+            "Value": {
+                "Fn::GetAtt": [
+                    "Subnet1",
+                    "AvailabilityZone"
+                ]
+            }
+        },
+        "NLBFullyQualifiedName": {
+            "Description": "The fully qualified name of the NLB",
+            "Value": {
+                "Fn::GetAtt": [
+                    "NetworkLoadBalancer",
+                    "DNSName"
+                ]
+            }
+        },
+        "NLBName": {
+            "Description": "The name of the NLB",
+            "Value": {
+                "Fn::GetAtt": [
+                    "NetworkLoadBalancer",
+                    "LoadBalancerName"
+                ]
+            }
+        },
+        "ECSClusterName": {
+            "Description": "The name of the ECS cluster",
+            "Value": {
+                "Ref": "ECSCluster"
+            }
+        },
+        "CWLogGroupName": {
+            "Description": "The name of the CWLogs group",
+            "Value": {
+                "Ref": "CWLogsGroup"
+            }
+        },
+        "SubnetId": {
+            "Description": "The ID of the subnet that the instances are associated with",
+            "Value": {
+                "Ref": "Subnet1"
+            }
+        },
+        "SecurityGroupId": {
+            "Description": "The ID of security group that the instances are members of",
+            "Value": {
+                "Ref": "InstanceSecurityGroup"
+            }
+        },
+        "MySQLTargetGroupArn": {
+            "Description": "The Arn of the MySQL target group",
+            "Value": {
+                "Ref": "MySQLTargetGroup"
+            }
+        }
+    }
+}

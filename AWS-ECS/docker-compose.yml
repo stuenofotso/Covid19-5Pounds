@@ -1,0 +1,58 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-covid19-cluster
+      - cluster.initial_master_nodes=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 99999
+        hard: 99999
+    volumes:
+      - /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    command: >
+      /bin/bash -c "echo 'vm.max_map_count=524288' > /etc/sysctl.conf
+      && /usr/local/bin/docker-entrypoint.sh"
+    networks:
+      - elastic
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: covid19
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: elasticsearch
+ 
+  web:
+    image: docker.elastic.co/kibana/kibana:7.6.2
+    container_name: kibana
+    environment:
+      - SERVER_PORT=80
+    ports:
+      - "80:80"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: covid19
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: web
+
+
+networks:
+  elastic:
+    driver: bridge
+    
+  

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:TalendJSON="http://www.talend.org/json" xmlns:TalendMetadata="http://www.talend.org/metadata/connection/2010" xmlns:orgomg.cwm.resource.record="http:///orgomg/cwm/resource/record.ecore">
+  <TalendJSON:JSONFileConnection xmi:id="__tjpAHOOEeqABovdVAAd1g" name="covid19_api_returned_data_json" id="__tjB8HOOEeqABovdVAAd1g" dataPackage="__tjpCXOOEeqABovdVAAd1g" JSONFilePath="/Users/steve/Documents/DOCU_JEFF/Heroku_Projects/Covid19/covid_data_sample.json" Encoding="UTF-8" readbyMode="JSONPATH">
+    <schema xmi:id="__tjpAXOOEeqABovdVAAd1g" LimitBoucle="50" AbsoluteXPathQuery="$[*]" flag="ROOT_OBJECT">
+      <schemaTargets xmi:id="_DQ-zIHcWEeql7Y9X5gtBJQ" RelativeXPathQuery="Country" TagName="Country"/>
+      <schemaTargets xmi:id="_DQ-zIXcWEeql7Y9X5gtBJQ" RelativeXPathQuery="CountryCode" TagName="CountryCode"/>
+      <schemaTargets xmi:id="_DQ-zIncWEeql7Y9X5gtBJQ" RelativeXPathQuery="Province" TagName="Province"/>
+      <schemaTargets xmi:id="_DQ-zI3cWEeql7Y9X5gtBJQ" RelativeXPathQuery="City" TagName="City"/>
+      <schemaTargets xmi:id="_DQ-zJHcWEeql7Y9X5gtBJQ" RelativeXPathQuery="CityCode" TagName="CityCode"/>
+      <schemaTargets xmi:id="_DQ-zJXcWEeql7Y9X5gtBJQ" RelativeXPathQuery="Lat" TagName="Lat"/>
+      <schemaTargets xmi:id="_DQ-zJncWEeql7Y9X5gtBJQ" RelativeXPathQuery="Lon" TagName="Lon"/>
+      <schemaTargets xmi:id="_DQ-zJ3cWEeql7Y9X5gtBJQ" RelativeXPathQuery="Confirmed" TagName="Confirmed"/>
+      <schemaTargets xmi:id="_DQ-zKHcWEeql7Y9X5gtBJQ" RelativeXPathQuery="Deaths" TagName="Deaths"/>
+      <schemaTargets xmi:id="_DQ-zKXcWEeql7Y9X5gtBJQ" RelativeXPathQuery="Recovered" TagName="Recovered"/>
+      <schemaTargets xmi:id="_DQ-zKncWEeql7Y9X5gtBJQ" RelativeXPathQuery="Active" TagName="Active"/>
+      <schemaTargets xmi:id="_DQ-zK3cWEeql7Y9X5gtBJQ" RelativeXPathQuery="Date" TagName="Date"/>
+      <schemaTargets xmi:id="_E2rJIHcXEeql7Y9X5gtBJQ" RelativeXPathQuery="LocationID" TagName="LocationID"/>
+    </schema>
+  </TalendJSON:JSONFileConnection>
+  <orgomg.cwm.resource.record:RecordFile xmi:id="__tjpCXOOEeqABovdVAAd1g" name="default" dataManager="__tjpAHOOEeqABovdVAAd1g">
+    <ownedElement xsi:type="TalendMetadata:MetadataTable" xmi:id="__tjpCnOOEeqABovdVAAd1g" id="_4CglsHOKEeqABovdVAAd1g" label="metadata">
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV4HcWEeql7Y9X5gtBJQ" label="Country" length="11" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV4XcWEeql7Y9X5gtBJQ" label="CountryCode" length="2" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV4ncWEeql7Y9X5gtBJQ" label="Province" length="28" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV43cWEeql7Y9X5gtBJQ" label="City" length="28" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV5HcWEeql7Y9X5gtBJQ" label="CityCode" length="28" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV5XcWEeql7Y9X5gtBJQ" label="Lat" length="6" precision="3" talendType="id_Double" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV5ncWEeql7Y9X5gtBJQ" label="Lon" length="-1" precision="3" talendType="id_Double" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV53cWEeql7Y9X5gtBJQ" label="Confirmed" length="1" talendType="id_Integer" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV6HcWEeql7Y9X5gtBJQ" label="Deaths" length="1" talendType="id_Integer" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV6XcWEeql7Y9X5gtBJQ" label="Recovered" length="1" talendType="id_Integer" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV6ncWEeql7Y9X5gtBJQ" label="Active" length="1" talendType="id_Integer" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_bByV63cWEeql7Y9X5gtBJQ" label="Date" length="-1" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+      <feature xsi:type="TalendMetadata:MetadataColumn" xmi:id="_HACpYHcXEeql7Y9X5gtBJQ" label="LocationID" length="36" talendType="id_String" pattern="&quot;dd-MM-yyyy&quot;"/>
+    </ownedElement>
+  </orgomg.cwm.resource.record:RecordFile>
+</xmi:XMI>
