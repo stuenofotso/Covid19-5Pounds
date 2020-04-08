@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="scalasparkforecaster_h" />
+    <profile name="sbt 2" modules="ScalaSparkForecaster_h_covid19">
+      <option name="deprecationWarnings" value="true" />
+    </profile>
+  </component>
+</project>
