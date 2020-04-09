@@ -18,7 +18,7 @@ object ForecastGBTMyCustom {
     SparkSession
       .builder()
       .appName("Covid19 Forecast")
-      .config("spark.master", "local[4]")
+      .config("spark.master", "local[16]")
       .getOrCreate()
 
   spark.sparkContext.setLogLevel("ERROR")
@@ -69,7 +69,12 @@ val HORIZON:Int = 20 //en jours
 
   def joinValeurMesureHorizonh(df1: DataFrame, df2: DataFrame,  featureColumnName:String, keyColumnsNames:String*): DataFrame = {
 
-    val ndf2 = addNtoColumnsName(df2, keyColumnsNames.toVector).withColumnRenamed("N_"+featureColumnName, featureColumnName)
+   /* println("df1.printSchema()")
+    df1.printSchema()
+    println("df2.printSchema()")
+    df2.printSchema()*/
+
+    val ndf2 = addNtoColumnsName(df2, keyColumnsNames.toVector).withColumnRenamed(featureColumnName, "N_"+featureColumnName)
 
 
     val pgroupedDf =  df1.
@@ -79,12 +84,12 @@ val HORIZON:Int = 20 //en jours
         "inner"
       )
 
-    pgroupedDf.drop("N_"+featureColumnName).drop(keyColumnsNames:_*)
+    pgroupedDf.drop("N_"+featureColumnName).drop(keyColumnsNames.map("N_"+_):_*)
 
   }
 
   def addTimeValColumns(df:DataFrame,  dateColumnName:String, featureColumnName:String, keyColumnsNames:String*):DataFrame = {
-    (1 to HORIZON).aggregate(df)((b, h)=>valeurMesureHorizonh(b, h, dateColumnName, featureColumnName, keyColumnsNames:_*), joinValeurMesureHorizonh(_, _, featureColumnName, keyColumnsNames:_*))
+    (1 to HORIZON).par.aggregate(df)((b, h)=>valeurMesureHorizonh(b, h, dateColumnName, featureColumnName, keyColumnsNames:_*), joinValeurMesureHorizonh(_, _, featureColumnName, keyColumnsNames:_*))
 
     /*if(h==0) df
     else {
@@ -143,7 +148,6 @@ val HORIZON:Int = 20 //en jours
 
 
 
-    readyDf.printSchema()
 
     // Split the data into train and test
     val splits = readyDf.randomSplit(Array(0.9, 0.1), seed = 1234L)
@@ -186,7 +190,7 @@ val HORIZON:Int = 20 //en jours
       .setEvaluator(new RegressionEvaluator())
       .setEstimatorParamMaps(paramGrid)
       .setNumFolds(3)
-      .setParallelism(50)
+      .setParallelism(3)
 
     // Train model. This also runs the indexer.
     println("begin of model training...")
