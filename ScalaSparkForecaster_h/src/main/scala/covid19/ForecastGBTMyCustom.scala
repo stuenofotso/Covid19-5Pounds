@@ -173,6 +173,7 @@ val HORIZON:Int = 20 //en jours
       .addGrid(gbt.maxDepth, Array(8, 10,12)) //10
       .build()*/
 
+    //Root Mean Squared Error (RMSE) on test data = 415.1760577417328
     val  paramGrid = new ParamGridBuilder()
       .addGrid(gbt.maxBins, Array(190))
       .addGrid(gbt.maxDepth, Array(10))
