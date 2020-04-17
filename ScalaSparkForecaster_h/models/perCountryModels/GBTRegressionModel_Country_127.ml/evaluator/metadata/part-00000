@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.evaluation.RegressionEvaluator","timestamp":1586583266200,"sparkVersion":"2.4.0","uid":"regEval_36a00c2a806c","paramMap":{},"defaultParamMap":{"labelCol":"label","metricName":"rmse","predictionCol":"prediction"}}
