@@ -157,7 +157,7 @@ With the rise in tempertaure, the confirmed cases tend to slow down (negative co
     val gbt = new GBTRegressor()
       .setLabelCol("label")
       .setFeaturesCol("features")
-    .setMaxIter(80)
+    .setMaxIter(50)
 
 
 

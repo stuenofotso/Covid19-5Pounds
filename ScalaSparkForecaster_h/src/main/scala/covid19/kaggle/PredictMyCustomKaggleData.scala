@@ -36,7 +36,7 @@ object PredictMyCustomKaggleData {
 
 
   val HORIZON:Int = 40 //en jours
-  val PREDICTION_HORIZON:Int = 35 //en jours
+  val PREDICTION_HORIZON:Int = 30 //en jours
 
 
 
@@ -172,7 +172,8 @@ object PredictMyCustomKaggleData {
       val finalDf = model.transform(readyDf)
         .withColumnRenamed("prediction", featureColumnName)
         .drop("features")
-          //.localCheckpoint(false)
+          //.cache()
+      //.localCheckpoint(false)
           .checkpoint()
 
       println(s"prediction computed  for  ${currentDate}, feature $featureColumnName...")
@@ -187,7 +188,7 @@ object PredictMyCustomKaggleData {
   def predictForFeatureAndTimeWindow(indexedDf:DataFrame, featureName:String, timeWindow:Int, keyColumnsNames:String*): DataFrame={
 
 
-    val model = CrossValidatorModel.load(s"models/KaggleDataModel_v3/GBTRegressionModel_total_cov_$featureName.ml")
+    val model = CrossValidatorModel.load(s"models/KaggleDataModel_v2/GBTRegressionModel_total_cov_$featureName.ml")
 
 
 
